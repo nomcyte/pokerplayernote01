@@ -22,58 +22,52 @@ const GameTracker: React.FC<GameTrackerProps> = ({
   onEditRange,
   onRemovePlayer,
 }) => {
-  const [activePlayer, setActivePlayer] = useState<number | null>(selectedPlayer);
+  const [isEditingPlayer, setIsEditingPlayer] = useState(false);
 
   useEffect(() => {
-    setActivePlayer(selectedPlayer);
+    if (selectedPlayer !== null) {
+      setIsEditingPlayer(true);
+    }
   }, [selectedPlayer]);
 
+  const handlePlayerSelect = (seat: number) => {
+    onEditRange(seat);
+  };
+
+  const handleBackToSelection = () => {
+    setIsEditingPlayer(false);
+    onBackToSeatSelection();
+  };
+
   const handleActionUpdate = (seat: number, action: string, position: string | null, hands: string[]) => {
-    const updatedPlayerData = {
+    savePlayerData({
       ...playerData,
       [seat]: {
         ...playerData[seat],
         actions: [...(playerData[seat]?.actions || []), { action, position, hands }],
       },
-    };
-    savePlayerData(updatedPlayerData);
+    });
   };
 
-  const handleMemoUpdate = (seat: number | null, playerName: string, memo: string, handRanges: PlayerData['actions']) => {
-    if (seat === null) return;
-    const existingPlayer = playerData[seat];
-    const updatedPlayerData = {
+  const handleMemoUpdate = (seat: number, playerName: string, memo: string, handRanges: PlayerData['actions']) => {
+    savePlayerData({
       ...playerData,
       [seat]: {
-        ...existingPlayer,
+        ...playerData[seat],
         name: playerName,
         actions: handRanges,
-        memos: [
-          ...(existingPlayer?.memos || []),
-          { text: memo, handRanges },
-        ],
+        memos: [...(playerData[seat]?.memos || []), { text: memo, handRanges }],
       },
-    };
-    savePlayerData(updatedPlayerData);
-  };
-
-  const handlePlayerSelect = (seat: number) => {
-    setActivePlayer(seat);
-    onEditRange(seat);
-  };
-
-  const handleBackToSelection = () => {
-    setActivePlayer(null);
-    onBackToSeatSelection();
+    });
   };
 
   return (
     <div className="w-full">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Game Tracker</h1>
-        <p className="text-lg text-gray-600 mt-2">Your seat: {selectedSeat}</p>
+        <h1 className="text-3xl font-bold text-gray-800">ゲームトラッカー</h1>
+        <p className="text-lg text-gray-600 mt-2">あなたの席: {selectedSeat}</p>
       </div>
-      {activePlayer === null ? (
+      {!isEditingPlayer ? (
         <PlayerSelection
           selectedSeat={selectedSeat}
           onPlayerSelect={handlePlayerSelect}
@@ -83,14 +77,14 @@ const GameTracker: React.FC<GameTrackerProps> = ({
         />
       ) : (
         <PlayerAction
-          seat={activePlayer}
+          seat={selectedPlayer}
           onActionUpdate={handleActionUpdate}
           onMemoUpdate={handleMemoUpdate}
           onBack={handleBackToSelection}
           onRemovePlayer={onRemovePlayer}
           savedPlayers={playerData}
-          allPlayers={{}}
-          editingPlayer={playerData[activePlayer]}
+          allPlayers={playerData}
+          editingPlayer={selectedPlayer !== null ? playerData[selectedPlayer] : null}
         />
       )}
     </div>

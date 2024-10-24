@@ -68,7 +68,6 @@ function App() {
 
   const handleEditRange = useCallback((seat: number) => {
     setSelectedPlayer(seat);
-    setCurrentScreen('playerAction');
   }, []);
 
   const handleRemovePlayer = useCallback((seat: number) => {

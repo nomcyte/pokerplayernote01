@@ -5,13 +5,13 @@ import { formatRanges } from '../utils/handRangeUtils';
 import { LogOut, Users } from 'lucide-react';
 
 interface PlayerActionProps {
-  seat: number | null;
-  onActionUpdate: (seat: number, action: string, position: string | null, hands: string[]) => void;
-  onMemoUpdate: (seat: number | null, playerName: string, memo: string, handRanges: PlayerData['actions']) => void;
+  seat: number;
+  onActionUpdate: (seat: number, action: Action, position: Position, hands: string[]) => void;
+  onMemoUpdate: (seat: number, playerName: string, memo: string, handRanges: PlayerData['actions']) => void;
   onBack: () => void;
   onRemovePlayer: (seat: number) => void;
   savedPlayers: Record<number, PlayerData>;
-  allPlayers: Record<string, PlayerData>;
+  allPlayers: Record<number, PlayerData>;
   editingPlayer: PlayerData | null;
 }
 
